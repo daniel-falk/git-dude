@@ -1,0 +1,13 @@
+[Unit]
+Description=Monitor git repos in /home/<USER-NAME>/.git-dude
+
+[Service]
+User=<USER-NAME>
+Type=simple
+WorkingDirectory=/home/<USER-NAME>/.git-dude/
+ExecStart=/home/<USER-NAME>/bin/git-dude/git-dude
+StandardError=journal
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

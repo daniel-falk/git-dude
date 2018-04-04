@@ -42,23 +42,15 @@ On OSX:
 
 ## Installation
 
+Make sure you have the `~/bin` directory (you can install it elsewhere if you change the service-file)
 ```bash
-$ curl -skL https://github.com/sickill/git-dude/raw/master/git-dude >~/bin/git-dude
-$ chmod +x ~/bin/git-dude
+$ mkdir -p ~/bin
 ```
 
-\* Make sure `~/bin` is in your `$PATH` or put `git-dude` script somewhere else
-on your `$PATH`.
-
-### Homebrew
-
-Git-dude can be installed with the following command:
-
+Clone the repo
 ```bash
-$ brew install https://gist.github.com/lukaszkorecki/1289314/raw/022cd33fc366378552dc3527d72b994568644df1/git-dude.rb --HEAD
+$ git clone https://github.com/daniel-falk/git-dude.git ~/bin/git-dude
 ```
-
-The homebrew formula lives [here](https://gist.github.com/1289314).
 
 ## Usage
 
@@ -89,21 +81,14 @@ projects:
 $ ln -s ~/code/tmuxinator .
 ```
 
-Now run this to monitor _pwd_:
-
+Update the `git-dude.service.template` file with your linux username and write it to `/etc/systemd/system`
 ```bash
-$ git dude
+$ cat ~/bin/git-dude/git-dude.service.template | sed "s/<USER-NAME>/$USER/g" | sudo tee /etc/systemd/system/git-dude.service
+
+$ sudo systemctl daemon-reload
+$ sudo systemctl enable git-dude
+$ sudo systemctl start git-dude
 ```
-
-You can also pass directory name as first argument to specify which directory
-to monitor instead of _pwd_.
-
-```bash
-$ git dude ~/watched-repos
-```
-
-This way you can have multiple _dude directories_ each being monitored by
-separate git-dude process.
 
 ## Configuration
 
@@ -125,7 +110,12 @@ Set custom notification command (`$TITLE`, `$DESCRIPTION` and `$ICON_PATH`
 environment variables are set when invoking notification command):
 
 ```bash
+$ git config --global dude.notify-command \
+        'echo "<b>$TITLE</b><br><br>$DESCRIPTION" | \
+        mail -a "Content-type: text/html" -s "git-dude - $TITLE" <YOUR_EMAIL>'
+
 $ git config --global dude.notify-command 'gntp-send "$TITLE" "$DESCRIPTION" "$ICON_PATH"'
+
 $ git config --global dude.notify-command 'echo -e "$TITLE\n\n\n$DESCRIPTION" | espeak --stdin -k20 -ven+12'
 ```
 
